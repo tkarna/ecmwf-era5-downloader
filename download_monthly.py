@@ -1,7 +1,7 @@
 import cdsapi
 from dateutil.rrule import rrule, MONTHLY
 import datetime
-from timeit import default_timer as timer
+from time import time as timer
 
 """
 Download ERA5 output for NemoNordic reference hindcast runs.
