@@ -26,7 +26,20 @@ These files can be used as forcing in Nemo 3.6 and 4.0.
 
 Dependency: nco
 
-## 3. Compute specific humidity
+## 3. Deaccumulate fields
+
+`./deaccumulate_fields.sh`
+
+Deaccumulates long/shortwave radiation fields by 1/3600.
+
+Produces files:
+`era5_radlw_y2016m06.nc`
+`era5_radsw_y2016m06.nc`
+...
+
+Dependency: nco
+
+## 4. Compute specific humidity
 
 `./compute_spec_hum.sh`
 

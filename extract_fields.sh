@@ -1,8 +1,7 @@
-
 #!/bin/bash
 
 start_date="2016-06-01"
-end_date="2017-03-01"
+end_date="2017-06-01"
 
 
 # map era5 variable names to nemo names
@@ -11,9 +10,9 @@ declare -A nemoname
 nemoname[u10]=U10m
 nemoname[v10]=V10m
 # short wave radiation
-nemoname[ssrd]=radsw
+nemoname[ssrd]=accradsw
 # long wave radiation
-nemoname[strdc]=radlw
+nemoname[strdc]=accradlw
 # 2 m air temperature
 nemoname[t2m]=T2m
 # total precipitation
@@ -54,4 +53,3 @@ while [ "$current_date" != "$check_date" ]; do
     # increment date
     current_date=`date +"%Y-%m-%d" -d "$current_date + 1 month"`;
 done
-
