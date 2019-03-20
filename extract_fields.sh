@@ -2,7 +2,7 @@
 #!/bin/bash
 
 start_date="2016-06-01"
-end_date="2016-07-01"
+end_date="2017-03-01"
 
 
 # map era5 variable names to nemo names
