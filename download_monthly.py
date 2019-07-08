@@ -92,7 +92,7 @@ end_month = datetime.datetime(2017, 6, 1)
 for date in rrule(MONTHLY, dtstart=start_month, until=end_month):
     print('\nFetching {:}'.format(date.strftime('%Y-%m')))
     tic = timer()
+    get_month(date.year, date.month)
     toc = timer()
     duration = datetime.timedelta(seconds=toc - tic)
-    get_month(date.year, date.month)
     print('Duration: {:}'.format(duration))
