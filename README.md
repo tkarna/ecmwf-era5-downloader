@@ -1,53 +1,22 @@
 # Preprocess Era5 atmospheric forcing fields for Nemo runs
 
-## 1. Download data
+## Download data for a month
 
-`python download_monthly.py`
+`python download_ecmwf_era5.py 2014-10`
 
 Downloads a subset of global fields to monthly files.
 
-Produces files:
-`reanalysis-era5_2016-06.nc`
-...
+Produces file:
+`era5_y2014m10.nc`
 
-Dependency: python, cdsapi
+Dependency: python, cdsapi, python-netCDF4
 
-## 2. Extract individual fields
+## Download multiple months
 
-`./extract_fields.sh`
-
-Extract individual fields from source files
+`python download_ecmwf_era5.py 2014-12 -e 2015-02`
 
 Produces files:
-`era5_D2M_y2016m06.nc`
-...
+`era5_y2014m12.nc`
+`era5_y2015m01.nc`
+`era5_y2015m02.nc`
 
-These files can be used as forcing in Nemo 3.6 and 4.0.
-
-Dependency: nco
-
-## 3. Deaccumulate fields
-
-`./deaccumulate_fields.sh`
-
-Deaccumulates long/shortwave radiation fields by 1/3600.
-
-Produces files:
-`era5_radlw_y2016m06.nc`
-`era5_radsw_y2016m06.nc`
-...
-
-Dependency: nco
-
-## 4. Compute specific humidity
-
-`./compute_spec_hum.sh`
-
-Produces files:
-era5_Q2_y2016m06.nc
-...
-
-Uses:
-`compute_spec_hum.py`
-
-Dependency: python, iris
