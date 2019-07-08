@@ -148,7 +148,7 @@ def download_month(year, month, output_file=None):
     # lat/lon grid resolution; None => Native 0.25 x 0.25 for atm
     grid = [0.20689655172413793, 0.1125]
     if output_file is None:
-        output_file = 'era5_{:}-{:}.nc'.format(year_str, month_str)
+        output_file = 'era5_y{:}m{:}.nc'.format(year_str, month_str)
 
     client = cdsapi.Client()
     product = 'reanalysis-era5-single-levels'
