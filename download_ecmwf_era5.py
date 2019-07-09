@@ -180,8 +180,10 @@ def convert_to_float(input_file, output_file, rm_source_file=False,
                 dst.setncattr(key, src.__dict__[key])
         # copy dimensions
         for name, dimension in src.dimensions.items():
-            dst.createDimension(
-                name, (len(dimension) if not dimension.isunlimited() else None))
+            size = len(dimension) if not dimension.isunlimited() else None
+            if name == 'time':
+                size = None  # ensure time dim is unlimited
+            dst.createDimension(name, (size))
         # copy all variables
         for name, variable in src.variables.items():
             dtype = numpy.float32
