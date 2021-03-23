@@ -18,6 +18,12 @@ To use ECMWF `cdsapi`, you'll need to create login credentials and store them
 in `$HOME/.cdsapirc ` file.
 See the [instructions](https://cds.climate.copernicus.eu/api-how-to).
 
+## Grid and field definitions
+
+At the moment the downloaded fields and the target latitude, longitude grids have been hard coded in the script.
+See `download_ecmwf_era5.py` header for details.
+
+
 ## Download data for a month
 
 `python download_ecmwf_era5.py 2014-10`
