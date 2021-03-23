@@ -17,6 +17,7 @@ Total precipitation,                        m,   tp, 228, accumulation
 Surface solar radiation downwards,    J m**-2, ssrd, 169, accumulation
 Surface thermal radiation downwards,  J m**-2, strd, 175, accumulation
 
+
 Accumulation:
 
 HRES: accumulations are over the hour ending at the forecast step
@@ -27,6 +28,14 @@ See:  https://confluence.ecmwf.int/pages/viewpage.action?pageId=104241513
 
 Snowfall and total precipitation have units m/step, step being 1 h.
 Nemo needs units kg/m^2/s. To deaccumulate divide by 3.6.
+
+Mean fields (alternative to above):
+Mean snowfall rate,           kg m**-2 s**-1,  msr, 235031
+Mean total precipitation rate kg m**-2 s**-1, mtpr, 235055
+Mean surface downward short-wave radiation flux, W m**-2, msdwswrf, 235035
+Mean surface downward long-wave radiation flux, W m**-2, msdwlwrf, 235036
+Mean sea level pressure, Pa, msl, 151
+
 
 Final variables are:
 u10:        10 metre U wind component (m s**-1)
@@ -105,6 +114,30 @@ import netCDF4
 import os
 
 
+# define number of significant digits to allow more compression
+precision = {
+ 'u10': 2,  # 20.0
+ 'v10': 2,  # 20.0
+ 'd2m': 1,  # 300.0
+ 't2m': 1,  # 300.0
+ 'sp': 0,  # 103000.0
+ 'msl': 0,  # 103000.0
+ 'sf': 5,  # 0.00200
+ 'tp': 5,  # 0.00200
+ 'daacc_tp': 6,  # 0.000600
+ 'deacc_sf': 6,  # 0.000600
+ 'msr': 6,  # 0.000600
+ 'mtpr': 6,  # 0.000600
+ 'ssrd': 0,  # 1e6
+ 'strd': 0,  # 1e6
+ 'deacc_ssrd': 1,  # 300
+ 'deacc_strd': 1,  # 300
+ 'msdwswrf': 1,  # 300
+ 'msdwlwrf': 1,  # 300
+ 'q2': 5,  # 0.007
+}
+
+
 def download_month(year, month, output_file=None):
     """
     Download one month of ERA5 single level data.
@@ -116,11 +149,11 @@ def download_month(year, month, output_file=None):
         '10m_v_component_of_wind',
         '2m_dewpoint_temperature',
         '2m_temperature',
-        'surface_pressure',
-        'snowfall',
-        'total_precipitation',
-        'surface_solar_radiation_downwards',
-        'surface_thermal_radiation_downwards',
+        'mean_snowfall_rate',
+        'mean_total_precipitation_rate',
+        'mean_surface_downward_short_wave_radiation_flux',
+        'mean_surface_downward_long_wave_radiation_flux',
+        'mean_sea_level_pressure',
     ]
     # ['01', '02, ..., '31']
     days = ['{:02d}'.format(day) for day in range(1, 32)]
@@ -154,9 +187,9 @@ def download_month(year, month, output_file=None):
     convert_to_float(tmp_file, output_file,
                      rm_source_file=True, verbose=False)
     # deaccumulate accumulated fields
-    deaccumulate_fields(output_file, ['ssrd', 'strd', 'tp', 'sf'])
+    # deaccumulate_fields(output_file, ['ssrd', 'strd', 'tp', 'sf'])
     # compute specific humidity
-    compute_specific_humidity(output_file)
+    compute_specific_humidity(output_file, spres_varname='msl')
     return output_file
 
 
@@ -187,7 +220,9 @@ def convert_to_float(input_file, output_file, rm_source_file=False,
         # copy all variables
         for name, variable in src.variables.items():
             dtype = numpy.float32
-            dst.createVariable(name, dtype, variable.dimensions)
+            digits = precision.get(name, None)
+            dst.createVariable(name, dtype, variable.dimensions, zlib=True,
+                               least_significant_digit=digits)
             dst[name][:] = variable[:]
             # copy variable attributes
             for key in variable.__dict__:
@@ -234,7 +269,10 @@ def deaccumulate_fields(ncfile, varname_list):
             var = src[varname]
             newvarname = 'deacc_' + varname
             if newvarname not in src.variables:
-                src.createVariable(newvarname, var.dtype, var.dimensions)
+                digits = precision.get(newvarname, None)
+                src.createVariable(newvarname, var.dtype, var.dimensions,
+                                   zlib=True, least_significant_digit=digits)
+
             newvar = src[newvarname]
             vals = var[:].astype(numpy.float32)
             newvar[:] = vals/scalar
@@ -293,8 +331,11 @@ def compute_specific_humidity(ncfile, dewp_varname='d2m', spres_varname='sp',
     Compute specific humidity from dewpoint and surface pressure fields.
     """
     with netCDF4.Dataset(ncfile, 'r+') as src:
+        digits = precision.get(shumi_varname, None)
         q2 = src.createVariable(shumi_varname, numpy.float32,
-                                ('time', 'latitude', 'longitude', ))
+                                ('time', 'latitude', 'longitude', ),
+                                zlib=True, least_significant_digit=digits)
+
         q2.units = 'g/g'
         q2.long_name = '2 m specific humidity'
 
