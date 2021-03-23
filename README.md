@@ -1,4 +1,22 @@
-# Preprocess Era5 atmospheric forcing fields for Nemo runs
+# Download and preprocess ERA5 atmospheric forcing fields for NEMO
+
+## Requirements
+
+Python packages:
+
+- netCDF4
+- numpy
+- cdsapi
+
+These can be installed with `pip`
+
+```bash
+pip install -r requirement.txt
+```
+
+To use ECMWF `cdsapi`, you'll need to create login credentials and store them
+in `$HOME/.cdsapirc ` file.
+See the [instructions](https://cds.climate.copernicus.eu/api-how-to).
 
 ## Download data for a month
 
@@ -8,8 +26,6 @@ Downloads a subset of global fields to monthly files.
 
 Produces file:
 `era5_y2014m10.nc`
-
-Dependency: python, cdsapi, python-netCDF4
 
 ## Download multiple months
 
